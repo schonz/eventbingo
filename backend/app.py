@@ -1,6 +1,7 @@
 from flask import Flask, request
 from flask_cors import CORS
 import json
+import os
 
 
 RULES = {
@@ -68,4 +69,10 @@ def api_removeRule():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    ENV = os.environ.get('APP_ENV')
+
+    # Check which Env we're running in
+    if ENV == 'prod':
+        app.run(host='0.0.0.0', debug=False)
+    else:
+        app.run(debug=True)
