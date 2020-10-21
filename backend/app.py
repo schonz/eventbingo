@@ -69,7 +69,7 @@ def api_removeRule():
 
 
 if __name__ == '__main__':
-    ENV = os.environ.get('APP_ENV')
+    ENV = os.environ.get('APP_ENV').lower()
 
     # Check which Env we're running in
     if ENV == 'prod':
