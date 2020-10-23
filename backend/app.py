@@ -64,8 +64,11 @@ def api_addRule():
 @app.route('/api/remove_rule', methods=['DELETE'])
 def api_removeRule():
     global RULES
+
     id = request.json['id']
-    del RULES[id]
+    del RULES[int(id)]
+
+    return 'removed {0}'.format(id)
 
 
 if __name__ == '__main__':
