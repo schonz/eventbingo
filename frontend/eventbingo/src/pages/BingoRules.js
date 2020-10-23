@@ -24,7 +24,7 @@ constructor(props){
 
     componentDidMount(){
         this.req_AllRules();
-        //setInterval(this.req_AllRules.bind(this), 5000);
+        setInterval(this.req_AllRules.bind(this), 5000);
     }
 
     async req_AddRule(data){
