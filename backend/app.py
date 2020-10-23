@@ -69,10 +69,10 @@ def api_removeRule():
 
 
 if __name__ == '__main__':
-    ENV = os.environ.get('APP_ENV').lower()
+    ENV = os.environ.get('APP_ENV')
 
     # Check which Env we're running in
-    if ENV == 'prod':
+    if ENV is not None and ENV.lower():
         app.run(host='0.0.0.0', debug=False)
     else:
         app.run(debug=True)
