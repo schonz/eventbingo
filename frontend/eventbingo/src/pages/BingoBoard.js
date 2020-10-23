@@ -10,7 +10,8 @@ class BingoBoard extends React.Component{
         this.URL_BASE = props.URL_BASE
 
         this.state = {
-            bingoBoard: [["1","2","3"],["4","5","6"],["7","8","9"]],
+            bingoBoard: [],
+            counter: 0
         };
     }
 
@@ -23,9 +24,12 @@ class BingoBoard extends React.Component{
         var nRows;
         var nCols;
         var bingoRule_ids = [];
+        var rows = [];
 
         rules = await this.req_AllRules();
         var nRules = rules.length;
+
+        console.log('Making new board')
 
         // Decide rows and columns
         nRows = 3
@@ -47,17 +51,21 @@ class BingoBoard extends React.Component{
         }
 
         // Assign to Bingo Rules
-        var rows = [];
         for (let iR = 0; iR < nRows; iR++){
             let row = [];
             for (let iC = 0; iC < nCols; iC++){
-                row.push(rules[bingoRule_ids[iR*nCols + iC]].text);
-                //row.push(rules[bingoRule_ids[iR*nCols + iC]]);
+                let tileText = rules[bingoRule_ids[iR*nCols + iC]].text;
+
+                row.push(<BoardTile text={tileText} key={iR+iC}/>);
+                //console.log(tileText)
             }
             rows.push(row);
         }
 
+        console.log(rows);
         this.setState({bingoBoard: rows})
+
+        console.log(this.state.bingoBoard)
     }
 
     async req_AllRules(){
@@ -78,17 +86,67 @@ class BingoBoard extends React.Component{
             style={{margin: "10px"}}>
                 {this.state.bingoBoard.map((row) => (
                     <Grid container justify="center" spacing={2}>
-                        {row.map((value) => (
-                            <Grid item  xs>
-                                <Paper>
-                                    <Button>{value}</Button>
-                                </Paper>
+                        {row.map((tile) => (
+                            <Grid item  xs >
+                                {tile}
                             </Grid>
                         ))}
                     </Grid>
                 ))}
             </Grid>
         </div>
+    }
+}
+
+class BoardTile2 extends React.Component{
+    constructor(props){
+        super(props)
+
+        this.text = props.text;
+    }
+
+    render() {
+        return <Paper>
+            <Button >
+                {this.text}
+            </Button>
+        </Paper>
+    }
+}
+
+class BoardTile extends React.Component{
+    constructor(props){
+        super(props)
+
+        this.key = props.key
+
+        this.state = {
+            text: props.text,
+            isChecked: false,
+            bgColor: "white"
+        }
+    }
+
+    Check(){
+        console.log(this.text);
+        if (this.state.isChecked){
+            this.color = "white";
+            this.setState({isChecked: false});
+            console.log("uncheck");
+        }
+        else{
+            this.color = "red";
+            this.setState({isChecked: true});
+            console.log("check");
+        }
+    }
+
+    render() {
+        return <Paper style={{backgroundColor: this.color}}>
+            <Button onClick={()=> this.Check()}>
+                {this.state.text}
+            </Button>
+        </Paper>
     }
 }
 
