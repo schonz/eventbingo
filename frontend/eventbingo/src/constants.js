@@ -1,13 +1,13 @@
 
 const prod = {
     url: {
-        API_URL: 'http://54.88.11.240:5000'
+        API_URL: '<prod-url>'
     }
 };
 
 const dev = {
     url: {
-        API_URL: 'http://localhost:5000'
+        API_URL: 'https://localhost:5000'
     }
 }
 
