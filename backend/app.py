@@ -75,7 +75,7 @@ if __name__ == '__main__':
     ENV = os.environ.get('APP_ENV')
 
     # Check which Env we're running in
-    if ENV is not None and ENV.lower():
+    if ENV is not None and ENV.lower() == 'prod':
         app.run(host='0.0.0.0', debug=False)
     else:
         app.run(debug=True)
