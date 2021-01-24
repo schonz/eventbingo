@@ -56,7 +56,7 @@ constructor(props){
         var strJson;
         
         text = this.state.newRuleText;
-        if (text.length <= 3){
+        if (text.replaceAll(' ','').length <= 3){
             alert('Need to add text');
             return;
         }
