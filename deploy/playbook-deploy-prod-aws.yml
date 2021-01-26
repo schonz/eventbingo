@@ -1,0 +1,100 @@
+---
+- name: deploy to aws
+  hosts: localhost
+
+
+  tasks:
+  # == Spool up resources in AWS ==
+  - name: Start up an ec2 instance to run the webserver
+    community.aws.ec2_instance:
+      name: "eventbingo-server"
+      key_name: "{{ ssh_key_name }}"
+      vpc_subnet_id:
+      instance_type: t3.small
+      security_group: PartyGames
+      network:
+          assign_public_ip: true
+      image_id: ami-0885b1f6bd170450c
+      wait: yes
+      tags:
+        project: eventbingo
+    register: ec2_info
+
+  - name: extract ip-address
+    set_fact:
+      #server_ip: "{{ lookup('file','test.json') | from_json | json_query('instances[*].public_ip_address') | first }}"
+      server_ip: "{{ ec2_info | json_query('instances[*].public_ip_address') | first }}"
+
+  - name: Create host group with new instance
+    add_host: 
+      name: "{{ server_ip }}"
+      groups: ec2Server
+      server_ip: "{{ server_ip }}"
+
+# == Install ==
+- hosts: ec2Server
+  become: yes
+  remote_user: ubuntu
+  gather_facts: true
+  vars:
+    ansible_ssh_private_key_file: "{{ ssh_key_path }}"
+    install_dir: '/opt/eventbingo'
+
+  tasks:
+    - name: upgrade machine first
+      apt:
+        update_cache: yes
+        upgrade: full
+    - name: install dependancies
+      apt:
+        name: 
+          - nodejs
+          - npm
+          - screen
+          - python3-pip
+  # -- Copy all resources to machine --
+    - name: copy git repo
+      git:
+        repo: 'https://github.com/schonz/eventbingo.git'
+        dest: "{{ install_dir }}"
+
+  # -- backend --
+    - name: install backend reqs
+      ansible.builtin.pip:
+        requirements: "{{ install_dir }}/backend/requirements.txt"
+
+  # -- frontend --
+    - name: replace <prod-url> with server public-ip
+      ansible.builtin.replace:
+        path: "{{ install_dir }}/frontend/eventbingo/src/constants.js"
+        regexp: '<prod-url>'
+        replace: "{{ server_ip }}:5000"
+
+    - name: install website dependencies
+      community.general.npm:
+        path: "{{ install_dir }}/frontend/eventbingo"
+    
+    - name: install serve
+      community.general.npm:
+        name: serve
+        global: yes
+
+  # == Run Servers ==
+  # run python server, submitting ip address
+  # One day I might get this working but for now . . .
+    # - name: start python server
+    #   command: 
+    #     cmd: nohup python3 app.py &
+    #     chdir: "{{ install_dir }}/backend"
+    #   environment:
+    #     APP_ENV: prod
+    #   async: 10
+    #   poll: 0
+
+    # - name: start node server
+    #   command: 
+    #     cmd: nohup serve -s build -l 3000 &
+    #     chdir: "{{ install_dir }}/frontend/eventbingo"
+    #   async: 10
+    #   poll: 0
+      
