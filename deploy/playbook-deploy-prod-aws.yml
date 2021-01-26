@@ -78,13 +78,17 @@
       community.general.npm:
         name: serve
         global: yes
+    
+    - name: build site
+      command:
+        cmd: npm run build
+        chdir: "{{ install_dir }}/frontend/eventbingo"
 
   # == Run Servers ==
   # run python server, submitting ip address
-  # One day I might get this working but for now . . .
     # - name: start python server
     #   command: 
-    #     cmd: nohup python3 app.py &
+    #     cmd: daemonize python3 app.py
     #     chdir: "{{ install_dir }}/backend"
     #   environment:
     #     APP_ENV: prod
