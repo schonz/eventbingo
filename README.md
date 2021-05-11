@@ -7,7 +7,7 @@
 
 ## Deployment
 First deploy the code with the ansible playbook; or just follow the steps in there.
-For the script to run through successfully you will need to set the environment variable `ANSIBLE_HOST_KEY_CHECKING=False` (This is a security risk).
+For the script to run through successfully you will need to set the ansible variable `ANSIBLE_HOST_KEY_CHECKING=False` (This is a security risk).
 
 After that run the following each in their own screen session.
 - backend: `export APP_ENV=prod && python3 app.py`
