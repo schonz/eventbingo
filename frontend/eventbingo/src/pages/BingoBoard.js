@@ -16,20 +16,23 @@ class BingoBoard extends React.Component{
     }
 
     componentDidMount(){
-        this.set_BingoRules()
+        this.req_AllRules();
+        this.set_BingoRules();
     }
 
     async set_BingoRules(){
         var rules;
         var nRows;
         var nCols;
-        var bingoRule_ids = [];
-        let rows = [];
+        var nTiles;
+        var pickList = [];
+        var bingoRule_idx = [];
+        var rows = [];
 
         console.log('Making new board');
         // This needs to be here because react won't redraw unless the state has changed
         // To something that isn't he BingoBoard tiles
-        await this.setState({bingoBoard: [[]]});
+        this.setState({bingoBoard: [[]]});
 
         rules = await this.req_AllRules();
         var nRules = rules.length;
@@ -37,30 +40,34 @@ class BingoBoard extends React.Component{
         // Decide rows and columns
         nRows = 3
         nCols = 3
-        //TODO return if not enough rules
+        nTiles = nRows * nCols
+        // return if not enough rules
+        if (nRules < (nRows * nCols)){
+            alert("Not enough rules");
+            return;
+        }
+        console.log(rules);
 
         // Select random IDs
-        var pickList = []
-        for (let i=0; i < rules.length; i++){
-            pickList.push(rules[i].id);
+        for (let i=0; i < nTiles; i++){
+            pickList.push(i);
         }
-
-        for (let i=0; i < rules.length; i++) {
-            let idx;
-            let newID;
-
-            idx = Math.floor(Math.random() * pickList.length);
-            newID = pickList.splice(idx, 1);
-            bingoRule_ids.push(newID);
+        for (let i=0; i < nTiles; i++){
+            let idx = Math.floor(Math.random() * pickList.length);
+            bingoRule_idx.push(pickList[idx])
+            pickList.splice(idx, 1);
         }
 
         // Assign to Bingo Rules
         for (let iR = 0; iR < nRows; iR++){
             let row = [];
             for (let iC = 0; iC < nCols; iC++){
-                let tileText = rules[bingoRule_ids[iR*nCols + iC]].text;
+                console.log('row: ' + iR + ' col: ' + iC)
+                let rule = rules[bingoRule_idx[iR*nCols + iC]];
+                console.log(rule)
 
-                row.push(<BoardTile text={tileText} id={iR+iC}/>);
+                row.push(<BoardTile text={rule.text} id={rule.id}/>);
+                console.log("R" + iR + " C" + iC);
             }
             rows.push(row);
         }
@@ -72,8 +79,8 @@ class BingoBoard extends React.Component{
         var response;
         var data;
 
-        response = await fetch(this.URL_BASE + "/api/all_rules");
-        data = response.json();
+        response = await fetch(this.URL_BASE + "/api/all_rules")
+        data = await response.json();
         return data
     }
 
