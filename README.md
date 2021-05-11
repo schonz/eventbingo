@@ -7,9 +7,10 @@
 
 ## Deployment
 First deploy the code with the ansible playbook; or just follow the steps in there.
-After that run the following each in their own screen
-- backend: `export APP_ENV=prod`
-- backend: `python3 app.py`
+For the script to run through successfully you will need to set the environment variable `ANSIBLE_HOST_KEY_CHECKING=False` (This is a security risk).
+
+After that run the following each in their own screen session.
+- backend: `export APP_ENV=prod && python3 app.py`
 - frontend: `serve -s build -l 3000`
 
 ## Ansible Collections
